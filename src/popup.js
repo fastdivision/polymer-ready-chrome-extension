@@ -65,6 +65,15 @@ function probeGitHub(username, elements, nextUrl) {
   xhr.send();
 }
 
+function copyTextToClipboard(text) {
+  var copyFrom = document.createElement("textarea");
+  copyFrom.textContent = text;
+  var body = document.getElementsByTagName('body')[0];
+  body.appendChild(copyFrom);
+  copyFrom.select();
+  document.execCommand('copy');
+  body.removeChild(copyFrom);
+}
 
 var port;
 
@@ -102,5 +111,18 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       probeGitHub('GoogleWebComponents', googleElements);
     }
     probeGitHub('Polymer', elements);
+
+    var copyButton = document.querySelector('#copy');
+    copyButton.addEventListener('click', function() {
+      var copyList = '';
+      response.customElements.forEach(function(el) {
+        if (copyList === '')
+          copyList = el;
+        else
+          copyList += ', ' + el;
+      });
+      copyTextToClipboard(copyList);
+      copyButton.innerHTML = 'Copied!';
+    });
   });
 });
